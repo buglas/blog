@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>李伟的博客</title>
+    <link rel="Shortcut Icon" href="https://yxyy-img.oss-cn-shanghai.aliyuncs.com/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="./css/com.css">
+    <link rel="stylesheet" type="text/css" href="./css/github-markdown.css">
+</head>
+<body>
+    <div id="app">
+        <h1 class="text-center page-title">{{title}}</h1>
+        <article class="container markdown-body" v-html="md"></article>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        let urlParam=getUrlParam();
+        const app = new Vue({
+            el: '#app',
+            data: {
+                title: urlParam.title,
+                md:'loading……'
+            },
+            created(){
+                getMd().then(md=>{
+                    this.md=md;
+                })
+            },
+        })
+        /*抓取md文件*/
+        function getMd(){
+            const url='https://blog-mds.oss-cn-beijing.aliyuncs.com/'+urlParam.ossName;
+            return fetch(url)
+                .then(res=>res.text())
+                .then(data=>{
+                    return marked(data);
+                })
+        }
+        /*获取url参数*/
+        function getUrlParam(){
+            let {search}=window.location;
+            search=search.slice(1,search.length);
+            search=search.split('&');
+            const obj={};
+            search.forEach(ele=>{
+                let [key,val]=ele.split('=');
+                obj[key]=decodeURIComponent(val);
+            })
+            return obj;
+        }
+    </script>
+</body>
+</html>

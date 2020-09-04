@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>李伟的博客</title>
+    <link rel="Shortcut Icon" href="https://yxyy-img.oss-cn-shanghai.aliyuncs.com/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="./css/github-markdown.css">
+    <link rel="stylesheet" type="text/css" href="./css/com.css">
+    <link rel="stylesheet" type="text/css" href="./css/menu.css">
+</head>
+<body>
+    <div id="app">
+        <h1 class="text-center page-title">李伟的博客</h1>
+        <article class="container">
+            <section class="row title" v-for="(md,ind) in mds" :key="ind">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <a
+                            :href="'./md.html?ossName='+md.ossName+'&title='+md.title"
+                            target="_blank"
+                            data-ossname="66666"
+                            class="title-main">
+                        {{md.title}}
+                    </a>
+                </div>
+            </section>
+        </article>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                mds: [{
+                    title:'loading……',
+                }]
+            },
+            created(){
+                getMds()
+                    .then(mds=>{
+                        console.log(mds);
+                        this.mds=mds;
+                    })
+            },
+            computed:{
+                ossName(event){
+                    console.log('event',event);
+                    const ossName='';
+                    return `./md.html?ossName=${ossName}`;
+                }
+            },
+            methods:{
+                toMd(ossName){
+                    console.log(ossName);
+
+                }
+            }
+
+        })
+        /*抓取json文件*/
+        function getMds(){
+            const url='https://blog-mds.oss-cn-beijing.aliyuncs.com/mds.json';
+            return fetch(url)
+                .then(res=>res.json())
+                .then(mds=>{
+                    return mds.map(md=>{
+                        const name=md.name;
+                        md.title=name.slice(0,name.length-3);
+                        return md;
+                    })
+            })
+        }
+    </script>
+</body>
+</html>

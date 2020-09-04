@@ -1,0 +1,20 @@
+.title-main{
+    color: #666;
+    line-height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.title-main:hover{
+    font-size: 16px;
+    color: #00acec;
+}
+@media screen and (min-width: 1440px) {
+    .title-main{
+        line-height: 36px;
+        transition: font-size 200ms;
+        font-size: 16px;
+    }
+    .title-main:hover{
+        font-size: 18px;
+    }
+}
