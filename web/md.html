@@ -8,11 +8,23 @@
     <link rel="Shortcut Icon" href="https://yxyy-img.oss-cn-shanghai.aliyuncs.com/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="./css/com.css">
     <link rel="stylesheet" type="text/css" href="./css/github-markdown.css">
+    <link rel="stylesheet" type="text/css" href="./css/md.css">
 </head>
 <body>
     <div id="app">
         <h1 class="text-center page-title">{{title}}</h1>
-        <article class="container markdown-body" v-html="md"></article>
+        <div class="container">
+            <article class="markdown-body" v-html="md"></article>
+            <div class="weixin">
+                <div class="text-center">
+                    <img src="https://yxyy-img.oss-cn-shanghai.aliyuncs.com/weixin.jpg" alt="微信">
+                </div>
+                <div class="text-center">
+                    最近忙着写webgl，没建评论区，有问题微信聊。
+                </div>
+            </div>
+        </div>
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
