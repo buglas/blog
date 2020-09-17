@@ -249,7 +249,7 @@ ctx.fillBox(20,20,300,200);
 
 因此，这个时候我们就需要找人翻译翻译什么叫惊喜。
 
-这个做翻译的人是谁呢，它就是我们之前提到过的手绘板，它在webgl 里叫“着色程序对象”。
+这个做翻译的人是谁呢，它就是我们之前提到过的手绘板，它在webgl 里叫“程序对象”。
 
 接下来咱们从手绘板的绘图步骤中捋一下webgl 的绘图思路。
 
@@ -258,11 +258,11 @@ ctx.fillBox(20,20,300,200);
 ### 3-webgl 的绘图思路
 
 1. 找一台电脑 - 浏览器里内置的webgl 渲染引擎，负责渲染webgl 图形，只认GLSL ES语言。
-2. 找一块手绘板 - 着色程序对象，承载GLSL ES语言，翻译GLSL ES语言和js语言，使两者可以相互通信。
+2. 找一块手绘板 - 程序对象，承载GLSL ES语言，翻译GLSL ES语言和js语言，使两者可以相互通信。
 3. 找一支触控笔 - 通过canvas 获取的webgl 类型的上下文对象，可以向手绘板传递绘图命令，并接收手绘板的状态信息。
 4. 开始画画 - 通过webgl 类型的上下文对象，用js 画画。
 
-在上面的思路中，大家对其中的一些名词可能还没有太深的概念，比如着色程序对象。接下来咱们就详细说一下webgl 实际的绘图步骤。
+在上面的思路中，大家对其中的一些名词可能还没有太深的概念，比如程序对象。接下来咱们就详细说一下webgl 实际的绘图步骤。
 
 
 
@@ -305,14 +305,14 @@ const gl=canvas.getContext('webgl');
 5.在js中获取顶点着色器和片元着色器
 
 ```js
-const VSHADER_SOURCE = document.getElementById('vertexShader').innerText;
-const FSHADER_SOURCE = document.getElementById('fragmentShader').innerText;
+const vsSource = document.getElementById('vertexShader').innerText;
+const fsSource = document.getElementById('fragmentShader').innerText;
 ```
 
 6.初始化着色器
 
 ```js
-initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
+initShaders(gl, vsSource, fsSource);
 ```
 
 7.指定将要用来清空绘图区的颜色
@@ -358,52 +358,45 @@ gl.drawArrays(gl.POINTS, 0, 1);
     // webgl画笔
     const gl = canvas.getContext('webgl');
     // 顶点着色器
-    const VSHADER_SOURCE = document.getElementById('vertexShader').innerText;
+    const vsSource = document.getElementById('vertexShader').innerText;
     // 片元着色器
-    const FSHADER_SOURCE = document.getElementById('fragmentShader').innerText;
+    const fsSource = document.getElementById('fragmentShader').innerText;
     // 初始化着色器
-    initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE);
+    initShaders(gl, vsSource, fsSource);
     // 指定将要用来清理绘图区的颜色
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0., 0.0, 0.0, 1.0);
     // 清理绘图区
     gl.clear(gl.COLOR_BUFFER_BIT);
     // 绘制顶点
     gl.drawArrays(gl.POINTS, 0, 1);
 
-
-    function initShaders(gl, vshader, fshader) {
-        //获取着色程序对象
-        const program = createProgram(gl, vshader, fshader);
-        //让上下文对象连接着色器程序对象
-        gl.linkProgram(shaderProgram);
-        //让上下文对象使用着色程序对象
-        gl.useProgram(program);
-        //将着色程序对象挂到上下文对象上
-        gl.program = program;
-        return true;
-    }
-    function createProgram(gl, vsSource, fsSource) {
+    function initShaders(gl,vsSource,fsSource){
+        //创建程序对象
+        const program = gl.createProgram();
         //建立着色对象
         const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
         const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
-        //创建着色器程序对象
-        const shaderProgram = gl.createProgram();
-        //把顶点着色对象装进着色程序对象中
-        gl.attachShader(shaderProgram, vertexShader);
-        //把片元着色对象装进着色程序对象中
-        gl.attachShader(shaderProgram, fragmentShader);
-        //返回着色器程序对象
-        return shaderProgram;
+        //把顶点着色对象装进程序对象中
+        gl.attachShader(program, vertexShader);
+        //把片元着色对象装进程序对象中
+        gl.attachShader(program, fragmentShader);
+        //连接webgl上下文对象和程序对象
+        gl.linkProgram(program);
+        //启动程序对象
+        gl.useProgram(program);
+        //将程序对象挂到上下文对象上
+        gl.program = program;
+        return true;
     }
 
     function loadShader(gl, type, source) {
-        //根据着色类型，建立着色对象
+        //根据着色类型，建立着色器对象
         const shader = gl.createShader(type);
-        //将着色器的函数体传入着色对象中
+        //将着色器源文件传入着色器对象中
         gl.shaderSource(shader, source);
-        //编译着色对象
+        //编译着色器对象
         gl.compileShader(shader);
-        //返回着色对象
+        //返回着色器对象
         return shader;
     }
 </script>
@@ -479,7 +472,7 @@ void main() {…… } 是主数体。
 
 初始化着色器的步骤：
 
-1. 建立着色器程序对象，目前这只是一个手绘板的外壳。
+1. 建立程序对象，目前这只是一个手绘板的外壳。
 
    ```js
    const shaderProgram = gl.createProgram();
@@ -496,7 +489,7 @@ void main() {…… } 是主数体。
 
    
 
-3. 将顶点着色器对象和片元着色器对象装进着色程序对象中，这就完成的手绘板的拼装。
+3. 将顶点着色器对象和片元着色器对象装进程序对象中，这就完成的手绘板的拼装。
 
    ```js
    gl.attachShader(shaderProgram, vertexShader);
@@ -505,7 +498,7 @@ void main() {…… } 是主数体。
 
    
 
-4. 连接webgl 上下文对象和着色器程序对象，就像连接触控笔和手绘板一样（触控笔里有传感器，可以向手绘板发送信号）。
+4. 连接webgl 上下文对象和程序对象，就像连接触控笔和手绘板一样（触控笔里有传感器，可以向手绘板发送信号）。
 
    ```
    gl.linkProgram(shaderProgram);
@@ -513,7 +506,7 @@ void main() {…… } 是主数体。
 
    
 
-5. 启动着色程序对象，就像按下了手绘板的启动按钮，使其开始工作。
+5. 启动程序对象，就像按下了手绘板的启动按钮，使其开始工作。
 
    ```
    gl.useProgram(program);
