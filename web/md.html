@@ -15,12 +15,12 @@
         <h1 class="text-center page-title">{{title}}</h1>
         <div class="container">
             <article class="markdown-body" v-html="md"></article>
-            <div class="weixin">
+            <div id="weixin"  v-show="loaded">
                 <div class="text-center">
-                    <img src="https://yxyy-img.oss-cn-shanghai.aliyuncs.com/weixin.jpg" alt="微信">
+                    <img width="300px" src="https://yxyy-img.oss-cn-shanghai.aliyuncs.com/weixin.jpg" alt="微信">
                 </div>
                 <div class="text-center">
-                    最近忙着写webgl，没建评论区，有问题微信聊。
+                    最近忙webgl，没建评论区，有问题微信聊
                 </div>
             </div>
         </div>
@@ -34,11 +34,13 @@
             el: '#app',
             data: {
                 title: urlParam.title,
-                md:'loading……'
+                md:'loading……',
+                loaded:false
             },
             created(){
                 getMd().then(md=>{
                     this.md=md;
+                    this.loaded=true;
                 })
             },
         })
