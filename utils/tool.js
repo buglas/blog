@@ -42,7 +42,7 @@ const tool={
                 }
                 if(type==='md'){
                     files.mds.push(file);
-                }else{
+                }else if(type!=='DS_Store'){
                     files.st.push(file);
                 }
             }

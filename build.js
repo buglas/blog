@@ -213,6 +213,9 @@ function compileMd(md,urls){
 * */
 function getUrls(md,folder,st){
     const reg = RegExp(/]\((.*?)\)/, 'gsm');
+    if(!reg[Symbol.matchAll]){
+        return [];
+    }
     const iterator=reg[Symbol.matchAll](md);
     const urlSet=new Set();
     for(let ele of iterator){
