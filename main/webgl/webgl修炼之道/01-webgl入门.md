@@ -470,9 +470,15 @@ webgl 有两种着色程序，都要用GLSL ES语言来写：
 
 void main() {…… } 是主数体。
 
-在顶点着色器中，gl_Position 是顶点的位置，gl_PointSize 是顶点的尺寸。
+在顶点着色器中，gl_Position 是顶点的位置，gl_PointSize 是顶点的尺寸，这种名称都是固定的，不能写成别的。
 
 在片元着色器中，gl_FragColor 是片元的颜色。
+
+vec4()  是一个4维矢量对象。
+
+将vec4() 赋值给顶点点位gl_Position 的时候，其中的前三个参数是x、y、z，第4个参数默认1.0，其含义我们后面会详解；
+
+将vec4() 赋值给片元颜色gl_FragColor 的时候，其中的参数是r,g,b,a。
 
 至于GLSL ES语言的其它知识，咱们会在后面另开一篇详解，这里先以入门为主。
 
