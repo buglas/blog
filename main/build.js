@@ -21,7 +21,7 @@
 * */
 const fs=require('fs')
 const tool=require('../utils/tool')
-const conf=require('./conf')
+const conf=require('../conf')
 const OSS = require('ali-oss')
 const mdsOld=require('../menu/mds')
 const stOld=require('../menu/st')
