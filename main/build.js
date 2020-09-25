@@ -20,8 +20,12 @@
 * */
 const fs=require('fs')
 const tool=require('../utils/tool')
+<<<<<<< HEAD
 const access=require('./access')
 const conf=require('./conf')(access.accessKeyId,access.accessKeySecret)
+=======
+const conf=require('../conf')
+>>>>>>> origin/master
 const OSS = require('ali-oss')
 const mdsOld=require('../mds')
 const stOld=require('../st')
