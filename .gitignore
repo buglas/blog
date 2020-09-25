@@ -1,4 +1,4 @@
 node_modules
 test
 .idea
-conf.json
+/main/access.json

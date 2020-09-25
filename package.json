@@ -2,7 +2,7 @@
   "name": "blog",
   "version": "1.0.0",
   "description": "",
-  "mds": "build.js",
+  "main": "main/build.js",
   "directories": {
     "test": "test"
   },

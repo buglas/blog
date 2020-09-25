@@ -61,7 +61,7 @@
         })
         /*抓取json文件*/
         function getMds(){
-            const url='https://blog-mds.oss-cn-beijing.aliyuncs.com/mds.json';
+            const url='https://blog-mds-test.oss-cn-beijing.aliyuncs.com/mds.json';
             return fetch(url)
                 .then(res=>res.json())
                 .then(mds=>{
