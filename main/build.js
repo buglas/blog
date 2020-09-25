@@ -1,7 +1,7 @@
 /*
 * fs node内置文件系统
 * tool 方法工具
-* conf 配置文件
+* menu 配置文件
 *   enter 博客入口
 *   out 博客出口，解析后的线上版md文件会发布到这里后，再上传到oss
 *   menu 博客目录
@@ -12,18 +12,19 @@
 *   bucketSt 存放静态资源的bucket配置参数，用于OSS用户端实例化
 *   bucketMds 存放md文件的bucket配置参数，用于OSS用户端实例化
 * OSS 阿里云的oss服务端接口对象
-* mdsOld 上一次build生成的md文件目录
-* stOld 上一次build生成的静态资源目录
-* menuOld 整合上一次上一次build生成的目录
+*
+* menuOld 上一次build生成的目录
+*   mds:mdsOld 上一次build生成的md文件目录
+*   st:stOld 上一次build生成的静态资源目录
 * menuNow 当前博客入口中的文件目录
 * clients 基于bucket配置项，将存放两种资源的bucket实例化
 * */
 const fs=require('fs')
-const tool=require('./utils/tool')
+const tool=require('../utils/tool')
 const conf=require('./conf')
 const OSS = require('ali-oss')
-const mdsOld=require('./mds')
-const stOld=require('./st')
+const mdsOld=require('../menu/mds')
+const stOld=require('../menu/st')
 const menuOld={mds:mdsOld,st:stOld};
 const menuNow=tool.getFiles(conf.enter);
 const clients={
