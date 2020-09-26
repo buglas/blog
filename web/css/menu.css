@@ -1,14 +1,39 @@
+.row{
+    margin-bottom: 12px;
+}
+.title{
+    line-height: 28px;
+    color: #999;
+    overflow: auto;
+}
+.title:hover{
+    color: #00acec!important;
+}
 .title-main{
     color: #666;
-    line-height: 28px;
     cursor: pointer;
     font-size: 14px;
 }
+
 .title-main:hover{
     font-size: 16px;
     color: #00acec;
 }
-
+.type{
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 42px;
+}
+.time{
+    float: right;
+    display: inline-block;
+    font-size: 14px;
+    width: 90px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    word-break: break-all;
+}
 @media screen and (min-width: 1440px) {
     .title-main{
         line-height: 36px;
@@ -17,5 +42,14 @@
     }
     .title-main:hover{
         font-size: 18px;
+    }
+    .type{
+        font-size: 18px;
+    }
+
+}
+@media screen and (min-width: 512px) {
+    .time{
+        width: auto;
     }
 }

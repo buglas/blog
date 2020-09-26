@@ -11,67 +11,152 @@
     <link rel="stylesheet" type="text/css" href="./css/menu.css">
 </head>
 <body>
-    <div id="app">
-        <h1 class="text-center page-title">李伟的博客</h1>
-        <article class="container">
-            <section class="row title" v-for="(md,ind) in mds" :key="ind">
-                <div class="col-sm-8 col-sm-offset-2">
-                    <a
-                            :href="'./md.html?ossName='+md.ossName+'&title='+md.title"
-                            target="_blank"
-                            data-ossname="66666"
-                            class="title-main">
-                        {{md.title}}
-                    </a>
-                </div>
-            </section>
-        </article>
-    </div>
+<div id="app">
+    <h1 class="text-center page-title">李伟的博客</h1>
+    <section class="container">
+        <div class="row " v-for="(o1,o1i) in mds" :key="o1i">
+            <div class="type">{{o1.type}}</div>
+            <template  v-for="(o2,o2k) in o1.files">
+                <template v-for="md in o2[1]">
+                    <div class="col-sm-8 col-sm-offset-2 title">
+                        <a
+                                :href="'./md.html?ossName='+md.ossName+'&title='+md.mdName"
+                                class="title-main">
+                            {{md.mdName}}
+                        </a>
+                        <span class="time">{{formatDate(md.mtime)}}</span>
+                    </div>
+                </template>
+            </template >
 
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script>
-        const app = new Vue({
-            el: '#app',
-            data: {
-                mds: [{
-                    title:'loading……',
-                }]
-            },
-            created(){
-                getMds()
-                    .then(mds=>{
-                        console.log(mds);
-                        this.mds=mds;
-                    })
-            },
-            computed:{
-                ossName(event){
-                    console.log('event',event);
-                    const ossName='';
-                    return `./md.html?ossName=${ossName}`;
-                }
-            },
-            methods:{
-                toMd(ossName){
-                    console.log(ossName);
+        </div>
+    </section>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+
+
+    const app = new Vue({
+        el: '#app',
+        data: {
+            mds: [{
+                title:'loading……',
+            }]
+        },
+        created(){
+            getMds()
+                .then(mds=>{
+                    // console.log(mds);
+                    this.mds=mds;
+                })
+        },
+        computed:{
+            ossName(event){
+                // console.log('event',event);
+                const ossName='';
+                return `./md.html?ossName=${ossName}`;
+            },
+            formatDate(st,fmt='yyyy-MM-dd hh:mm:ss') {
+
+                return function(st,fmt='yyyy-MM-dd hh:mm:ss'){
+                    const date=new Date(st)
+                    const o = {
+                        "M+" : date.getMonth()+1,                 //月份
+                        "d+" : date.getDate(),                    //日
+                        "h+" : date.getHours(),                   //小时
+                        "m+" : date.getMinutes(),                 //分
+                        "s+" : date.getSeconds(),                 //秒
+                        "q+" : Math.floor((date.getMonth()+3)/3), //季度
+                        "S"  : date.getMilliseconds()             //毫秒
+                    };
+                    if(/(y+)/.test(fmt)) {
+                        fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
+                    }
+                    for(var k in o) {
+                        if(new RegExp("("+ k +")").test(fmt)){
+                            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+                        }
+                    }
+                    return fmt;
                 }
             }
-
-        })
-        /*抓取json文件*/
-        function getMds(){
-            const url='https://blog-mds.oss-cn-beijing.aliyuncs.com/mds.json';
-            return fetch(url)
-                .then(res=>res.json())
-                .then(mds=>{
-                    return mds.map(md=>{
-                        const name=md.name;
-                        md.title=name.slice(0,name.length-3);
-                        return md;
-                    })
-            })
+        },
+        methods:{
+            toMd(ossName){
+                // console.log(ossName);
+            }
         }
-    </script>
+
+    })
+    /*抓取json文件*/
+    function getMds(){
+        const url='https://blog-mds.oss-cn-beijing.aliyuncs.com/mds.json';
+        return fetch(url)
+            .then(res=>res.json())
+            .then(mds=>{
+                return sortMds(mds);
+                /*return mds.map(md=>{
+                    const name=md.name;
+                    md.title=name.slice(0,name.length-3);
+                    return md;
+                })*/
+            })
+    }
+    /*
+    ctime: 1601041749885
+    folder: "./mds/数学/漫谈直线"
+    mtime: 1601041749885
+    name: "01-漫谈直线之向量.md"
+    ossName: "16010431118066206651570541597.md"
+    path: "./mds/数学/漫谈直线/01-漫谈直线之向量.md"
+    mdName: "漫谈直线之向量"
+    type: "md"
+    * */
+    function sortMds(mds){
+        const map1=new Map();
+        mds.forEach((ele)=>{
+            const folders=ele.folder.split('/');
+            const foldTop=folders[2];
+            const foldBot=folders.pop();
+            const [index]=ele.name.split('-');
+            const reg = RegExp(/-(.*?)\.md/);
+            const mdName=reg.exec(ele.name)[1];
+            const file={
+                foldTop,
+                foldBot,
+                index,
+                mdName,
+                ...ele
+            }
+            if(map1.has(foldTop)){
+                map1.get(foldTop).push(file);
+            }else{
+                map1.set(foldTop,[file])
+            }
+        })
+        map1.forEach((files)=>{
+            console.log(files);
+            files.sort((a,b)=>a.index-b.index);
+        })
+        const menu=[];
+        for(let key of map1.keys()){
+            const files=map1.get(key);
+            const map2=new Map();
+            files.forEach((file)=>{
+                const {foldBot}=file;
+                if(map2.has(foldBot)){
+                    map2.get(foldBot).push(file);
+                }else{
+                    map2.set(foldBot,[file])
+                }
+            })
+            menu.push({type:key,files:map2})
+        }
+        return menu;
+    }
+
+
+</script>
 </body>
 </html>

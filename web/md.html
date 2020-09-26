@@ -46,7 +46,7 @@
         })
         /*抓取md文件*/
         function getMd(){
-            const url='https://blog-mds-test.oss-cn-beijing.aliyuncs.com/'+urlParam.ossName;
+            const url='https://blog-mds.oss-cn-beijing.aliyuncs.com/'+urlParam.ossName;
             return fetch(url)
                 .then(res=>res.text())
                 .then(data=>{
