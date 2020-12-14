@@ -35,8 +35,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script>
-
-
     const app = new Vue({
         el: '#app',
         data: {
@@ -52,34 +50,12 @@
                 })
         },
         computed:{
-            ossName(event){
-                // console.log('event',event);
+            ossName(){
                 const ossName='';
                 return `./md.html?ossName=${ossName}`;
             },
-            formatDate(st,fmt='yyyy-MM-dd hh:mm:ss') {
-
-                return function(st,fmt='yyyy-MM-dd hh:mm:ss'){
-                    const date=new Date(st)
-                    const o = {
-                        "M+" : date.getMonth()+1,                 //月份
-                        "d+" : date.getDate(),                    //日
-                        "h+" : date.getHours(),                   //小时
-                        "m+" : date.getMinutes(),                 //分
-                        "s+" : date.getSeconds(),                 //秒
-                        "q+" : Math.floor((date.getMonth()+3)/3), //季度
-                        "S"  : date.getMilliseconds()             //毫秒
-                    };
-                    if(/(y+)/.test(fmt)) {
-                        fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
-                    }
-                    for(var k in o) {
-                        if(new RegExp("("+ k +")").test(fmt)){
-                            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
-                        }
-                    }
-                    return fmt;
-                }
+            formatDate() {
+                return formatDate;
             }
         },
         methods:{
@@ -89,12 +65,36 @@
         }
 
     })
+
+    /*格式化时间*/
+    function formatDate(st,fmt='yyyy-MM-dd hh:mm:ss'){
+        const date=new Date(st)
+        const o = {
+            "M+" : date.getMonth()+1,                 //月份
+            "d+" : date.getDate(),                    //日
+            "h+" : date.getHours(),                   //小时
+            "m+" : date.getMinutes(),                 //分
+            "s+" : date.getSeconds(),                 //秒
+            "q+" : Math.floor((date.getMonth()+3)/3), //季度
+            "S"  : date.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    }
     /*抓取json文件*/
     function getMds(){
         const url='https://blog-mds.oss-cn-beijing.aliyuncs.com/mds.json';
         return fetch(url)
             .then(res=>res.json())
             .then(mds=>{
+                // sortMds2(mds)
                 return sortMds(mds);
                 /*return mds.map(md=>{
                     const name=md.name;
@@ -103,6 +103,18 @@
                 })*/
             })
     }
+    function sortMds2(mds){
+        console.log(mds);
+        const ps=[];
+        mds.forEach(({path})=>{
+            const p=path.split('./mds/')[1].split('/');
+            console.log(p);
+            ps.push(p);
+        })
+    }
+
+
+
     /*
     ctime: 1601041749885
     folder: "./mds/数学/漫谈直线"
@@ -110,52 +122,79 @@
     name: "01-漫谈直线之向量.md"
     ossName: "16010431118066206651570541597.md"
     path: "./mds/数学/漫谈直线/01-漫谈直线之向量.md"
-    mdName: "漫谈直线之向量"
+    name: "漫谈直线之向量"
     type: "md"
     * */
     function sortMds(mds){
-        const map1=new Map();
+
+        const files=[];
         mds.forEach((ele)=>{
             const folders=ele.folder.split('/');
-            const foldTop=folders[2];
-            const foldBot=folders.pop();
-            const [index]=ele.name.split('-');
-            const reg = RegExp(/-(.*?)\.md/);
-            const mdName=reg.exec(ele.name)[1];
+            const {index:index1,name:menu1}=parseFileName(folders[2]);
+            const {index:index2,name:menu2}=parseFileName(folders.pop());
+            const {index:index3,name:mdName}=parseFileName2(ele.name);
+            const index=''+index1+index2+index3;
             const file={
-                foldTop,
-                foldBot,
+                menu1,
+                menu2,
                 index,
                 mdName,
                 ...ele
             }
-            if(map1.has(foldTop)){
-                map1.get(foldTop).push(file);
-            }else{
-                map1.set(foldTop,[file])
-            }
+            files.push(file);
         })
-        map1.forEach((files)=>{
-            console.log(files);
-            files.sort((a,b)=>a.index-b.index);
-        })
+        //整体排序
+        files.sort((a,b)=>a.index-b.index);
+
+        //一级目录集合
+        const map1=crtMenu(files);
+        console.log(map1.values());
+        //总目录
         const menu=[];
         for(let key of map1.keys()){
             const files=map1.get(key);
-            const map2=new Map();
-            files.forEach((file)=>{
-                const {foldBot}=file;
-                if(map2.has(foldBot)){
-                    map2.get(foldBot).push(file);
-                }else{
-                    map2.set(foldBot,[file])
-                }
-            })
+            const map2=crtMenu(files);
             menu.push({type:key,files:map2})
         }
         return menu;
     }
-
+    /*crtMenu 建立目录*/
+    function crtMenu(files){
+        const map=new Map();
+        files.forEach(file=>{
+            const {menu1}=file;
+            if(map.has(menu1)){
+                map.get(menu1).push(file);
+            }else{
+                map.set(menu1,[file])
+            }
+        })
+        return map;
+    }
+    /*从文件名01-www 中解构序列号和文件名*/
+    function parseFileName(str){
+        let [index,name]=str.split('-');
+        if(!parseInt(index)){
+            index='00';
+        }
+        return {index,name}
+    }
+    function parseFileName2(str){
+        const index=getIndex(str);
+        //获取文章名
+        const reg = RegExp(/-(.*?)\.md/);
+        const name=reg.exec(str)[1];
+        return {index,name}
+    }
+    /*获取序列号*/
+    function getIndex(str){
+        //获取序列号
+        let [index]=str.split('-');
+        if(!parseInt(index)){
+            index='00';
+        }
+        return index;
+    }
 
 </script>
 </body>
