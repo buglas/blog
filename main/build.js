@@ -28,6 +28,10 @@ const mdsOld=require('../menu/mds')
 const stOld=require('../menu/st')
 const menuOld={mds:mdsOld,st:stOld};
 const menuNow=tool.getFiles(conf.enter);
+/*console.log('menuNow',menuNow.mds);
+menuNow.mds.forEach(ele=>{
+    console.log(ele.name);
+})*/
 const clients={
     st:new OSS(conf.bucketSt),
     mds:new OSS(conf.bucketMds)
@@ -49,6 +53,8 @@ async function update(){
     writeMenu('mds',mds);
 }
 
+
+
 /*setFiles 对博客入口中的文件进行增加、修改、提交、删除操作
 *   getFilesState() 对新旧两种目录进行对比，返回目录状态信息，如所有已删除的文件、新增的文件、修改过的文件
 *   若新旧目录一样，则返回null；否则：
@@ -59,6 +65,7 @@ async function update(){
 async function setFiles(mold,st){
     const filesOld=menuOld[mold];
     const filesNow=menuNow[mold];
+
     const {df,nf,uf,cf,menu,change}=getFilesState(filesNow,filesOld);
     if(!change){return null}
     const client=clients[mold];
@@ -66,6 +73,7 @@ async function setFiles(mold,st){
     cf.length&&console.log('cf-新增文件',cf);
     uf.length&&console.log('uf-修改文件',uf);
     df.length&&console.log('df-移除文件',df);
+    console.log('nf',nf);
     await updateFiles(mold,client,nf,st);
     await deleteFiles(mold,client,df);
     return menu;
